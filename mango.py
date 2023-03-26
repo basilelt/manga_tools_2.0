@@ -19,6 +19,7 @@ waifu_path = os.path.join(current_path, "waifu2x", "waifu2x-ncnn-vulkan.exe")
 path_stitcher = os.path.join(current_path, "SmartStitch", "SmartStitchConsole.py")
 oxipng_path = os.path.join(current_path, "oxipng", "oxipng.exe")
 mangadex_path = os.path.join(current_path, "mangadex_bulk_uploader", "md_uploader.py")
+path_fmd = os.path.join(current_path, "fmd", "fmd.exe")
 
 download_path = os.path.join(current_path, "download")
 denoise_path = os.path.join(current_path, "denoise")
