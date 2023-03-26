@@ -6,10 +6,6 @@ import cv2
 ## ! Install requirements.txt with pip !
 
 
-## Downloading chapters
-subprocess.run([path_fmd])
-
-
 ## Get working directory
 name = os.path.basename(__file__)
 current_path = __file__.replace(name, "")
@@ -28,6 +24,14 @@ upload_path = os.path.join(current_path, "mangadex_bulk_uploader", "to_upload")
 uploaded_path = os.path.join(current_path, "mangadex_bulk_uploader", "uploaded")
 drive_path = r'D:\Gdrive\.shortcut-targets-by-id\1dp1NNqw9AuMIHcOgoY8TJT6c75HwHBpn\Zero Scans Projects' ## Change to your need
 
+
+## Downloading chapters
+subprocess.run([path_fmd])
+
+## To modify to match your raws and drive folders
+raw_lst =["来自深渊的我今天也要拯救人类", "我只想安静地打游戏", "我必须成为怪物", "只靠防御称霸诸天", "魔石异世录——艾莎的救赎"]
+name_lst = ["Abyss", "I Just Want to Play the Game Quietly", "I Must Become A Monster", "Dominate the World Only by Defense", "Aisha's Salvation"]
+to_denoise = raw_lst + ['我真不是邪神走狗']
 
 ## Denoising resizing
 for manga in os.listdir(download_path):
@@ -58,8 +62,10 @@ for manga in os.listdir(download_path):
 			if width < max_width:
 				ratio = str(max_width / width)
 				subprocess.run([waifu_path, '-i', img_path, '-o', img_out_path, '-n', '3', '-s', ratio, '-x'])
-			else:
+			elif manga in to_denoise:
 				subprocess.run([waifu_path, '-i', img_path, '-o', img_out_path, '-n', '3', '-s', '1', '-x'])
+			else:
+				shutil.move(img_path, img_out_path)
 
 	shutil.rmtree(manga_path)
 
@@ -89,10 +95,6 @@ for manga in os.listdir(denoise_path):
 subprocess.run([oxipng_path, denoise_path, '-o', 'max', '-r', '--strip', 'all', '-a', '-i', '0', '--fix', '-Z', '-t', '512'])
 ## '-f', '0,9', '-zc', '12'
 
-
-## To modify to match your raws and drive folders
-raw_lst =["来自深渊的我今天也要拯救人类", "我只想安静地打游戏", "我必须成为怪物", "只靠防御称霸诸天", "魔石异世录——艾莎的救赎"]
-name_lst = ["Abyss", "I Just Want to Play the Game Quietly", "I Must Become A Monster", "Dominate the World Only by Defense", "Aisha's Salvation"]
 
 ## Moving Output to Drive directory
 for manga in os.listdir(denoise_path):
@@ -134,7 +136,7 @@ for manga in os.listdir(denoise_path):
 
 
 ## Upload chapter to mangadex
-subprocess.run(['python', mangadex_path])
-shutil.rmtree(manga_path)
+#subprocess.run(['python', mangadex_path])
+#shutil.rmtree(manga_path)
 
 print("done")
