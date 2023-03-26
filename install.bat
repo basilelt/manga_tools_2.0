@@ -78,3 +78,8 @@ powershell -Command "Get-ChildItem -Directory -Filter 'waifu2x*' | Rename-Item -
 powershell -Command "Invoke-WebRequest -Uri ((Invoke-WebRequest -Uri https://api.github.com/repos/dazedcat19/FMD2/releases/latest | ConvertFrom-Json).assets | Where-Object { $_.name -like 'fmd*-win64.7z' } | Select-Object -First 1).browser_download_url -OutFile fmd.7z"
 7z x .\fmd.7z -ofmd
 del .\fmd.7z
+
+curl -o image_magick.zip https://imagemagick.org/archive/binaries/ImageMagick-7.1.1-5-portable-Q16-HDRI-x64.zip
+mkdir image_magick
+tar -xf .\image_magick.zip -C image_magick
+del .\image_magick.zip

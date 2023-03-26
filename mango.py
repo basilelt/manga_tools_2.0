@@ -2,6 +2,7 @@ import os
 import subprocess
 import shutil
 import cv2
+import math
 
 ## ! Install requirements.txt with pip !
 
@@ -16,6 +17,8 @@ path_stitcher = os.path.join(current_path, "SmartStitch", "SmartStitchConsole.py
 oxipng_path = os.path.join(current_path, "oxipng", "oxipng.exe")
 mangadex_path = os.path.join(current_path, "mangadex_bulk_uploader", "md_uploader.py")
 path_fmd = os.path.join(current_path, "fmd", "fmd.exe")
+path_mogrify = os.path.join(current_path, "image_magick", "mogrify.exe")
+path_magick = os.path.join(current_path, "image_magick", "magick.exe")
 
 download_path = os.path.join(current_path, "download")
 denoise_path = os.path.join(current_path, "denoise")
@@ -46,6 +49,8 @@ for manga in os.listdir(download_path):
 		max_width = 0
 		for img in os.listdir(chapter_path):
 			img_path = os.path.join(chapter_path, img)
+			subprocess.run([path_mogrify, img_path])
+
 			im = cv2.imread(img_path)
 			width = im.shape[1]
 
@@ -60,8 +65,15 @@ for manga in os.listdir(download_path):
 			width = im.shape[1]
 
 			if width < max_width:
-				ratio = str(max_width / width)
+				ratio = math.ceil(max_width / width)
+				if ratio % 2 != 0:
+					ratio += ratio
+				ratio = str(ratio)
+
 				subprocess.run([waifu_path, '-i', img_path, '-o', img_out_path, '-n', '3', '-s', ratio, '-x'])
+				size = str(max_width) + "x"
+				subprocess.run([path_magick, img_out_path, "-resize", size, img_out_path])
+
 			elif manga in to_denoise:
 				subprocess.run([waifu_path, '-i', img_path, '-o', img_out_path, '-n', '3', '-s', '1', '-x'])
 			else:
