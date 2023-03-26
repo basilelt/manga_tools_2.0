@@ -5,6 +5,11 @@ import cv2
 
 ## ! Install requirements.txt with pip !
 
+
+## Downloading chapters
+subprocess.run([path_fmd])
+
+
 ## Get working directory
 name = os.path.basename(__file__)
 current_path = __file__.replace(name, "")
@@ -58,14 +63,14 @@ for manga in os.listdir(download_path):
 	shutil.rmtree(manga_path)
 
 
-raw_no_stitch = ["魔石异世录——艾莎的救赎"] ## To modify to match your paged series
+no_stitch = ["魔石异世录——艾莎的救赎", "Star Martial God Technique", "The Demon King Who Lost His Job"] ## To modify to match your paged series
 raw = ["来自深渊的我今天也要拯救人类", "我只想安静地打游戏", "我必须成为怪物", "只靠防御称霸诸天", "我真不是邪神走狗"] ## To modify to match your raws (different stitch size than upload)
 
 ## Stitching chapters
 for manga in os.listdir(denoise_path):
 	manga_path = os.path.join(denoise_path, manga)
 	
-	if manga in raw_no_stitch: ## Paged series
+	if manga in no_stitch: ## Paged series
 		print(f"{manga} does not need stitching")
 	
 	elif manga in raw:
@@ -120,7 +125,7 @@ for manga in os.listdir(denoise_path):
 	else:
 		for chapter in os.listdir(manga_path):
 			chapter_path = os.path.join(manga_path, chapter)
-			raw_path = os.path.join(upload_path, chapter)
+			raw_path = os.path.join(upload_path, chapter.replace("Chapter ", "c"))
 			
 			shutil.move(chapter_path, raw_path)
 		
