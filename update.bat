@@ -22,7 +22,3 @@ powershell -Command "Invoke-WebRequest -Uri ((Invoke-WebRequest -Uri https://api
 tar -xf .\waifu2x-ncnn-vulkan-windows.zip
 del .\waifu2x-ncnn-vulkan-windows.zip
 powershell -Command "Get-ChildItem -Directory -Filter 'waifu2x*' | Rename-Item -NewName 'waifu2x' -Force"
-
-powershell -Command "Invoke-WebRequest -Uri ((Invoke-WebRequest -Uri https://api.github.com/repos/dazedcat19/FMD2/releases/latest | ConvertFrom-Json).assets | Where-Object { $_.name -like 'fmd*-win64.7z' } | Select-Object -First 1).browser_download_url -OutFile fmd.7z"
-7z x .\fmd.7z -ofmd
-del .\fmd.7z
