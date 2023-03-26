@@ -27,3 +27,5 @@ setup the config files of mangadex uploader
 
 
 edit the mango.py file as you see fit
+
+does not take volumes for mangadex upload
