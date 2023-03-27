@@ -36,7 +36,24 @@ raw_lst =["来自深渊的我今天也要拯救人类", "我只想安静地打�
 name_lst = ["Abyss", "I Just Want to Play the Game Quietly", "I Must Become A Monster", "Dominate the World Only by Defense", "Aisha's Salvation"]
 to_denoise = raw_lst + ['我真不是邪神走狗']
 
-## Denoising resizing
+
+## Renaming weird chars
+for manga in os.listdir(download_path):
+	manga_path = os.path.join(download_path, manga)
+	if manga == "I’ve Been Trapped on the Same Day for Over 3000 Years":
+		manga = "Ive Been Trapped on the Same Day for Over 3000 Years"
+		os.rename(os.path.join(manga_path), os.path.join(download_path, manga))
+		manga_path = os.path.join(download_path, manga)
+	
+	for chapter in os.listdir(manga_path):
+		chapter_path = os.path.join(manga_path, chapter)
+		if "I’ve Been Trapped on the Same Day for Over 3000 Years" in chapter:
+			chapter = chapter.replace("I’ve Been Trapped on the Same Day for Over 3000 Years", "Ive Been Trapped on the Same Day for Over 3000 Years")
+			os.rename(os.path.join(chapter_path), os.path.join(manga_path, chapter))
+			chapter_path = os.path.join(manga_path, chapter)
+
+
+## Denoising resizing		
 for manga in os.listdir(download_path):
 	manga_path = os.path.join(download_path, manga)
 	denoise_out = os.path.join(denoise_path, manga)
@@ -65,9 +82,12 @@ for manga in os.listdir(download_path):
 			width = im.shape[1]
 
 			if width < max_width:
-				ratio = math.ceil(max_width / width)
-				if ratio % 2 != 0:
-					ratio += ratio
+				ratio = max_width / width
+				if int(ratio) not in [1, 2, 4, 8, 16, 32, 64, 128]:
+					i = 2
+					while i < ratio:
+						i *= 2
+					ratio = i
 				ratio = str(ratio)
 
 				subprocess.run([waifu_path, '-i', img_path, '-o', img_out_path, '-n', '3', '-s', ratio, '-x'])
@@ -76,6 +96,7 @@ for manga in os.listdir(download_path):
 
 			elif manga in to_denoise:
 				subprocess.run([waifu_path, '-i', img_path, '-o', img_out_path, '-n', '3', '-s', '1', '-x'])
+
 			else:
 				shutil.move(img_path, img_out_path)
 
@@ -142,7 +163,14 @@ for manga in os.listdir(denoise_path):
 			chapter_path = os.path.join(manga_path, chapter)
 			raw_path = os.path.join(upload_path, chapter.replace("Chapter ", "c"))
 			
+			if "Second Life Ranker" in raw_path:
+				raw_path.replace("[ZeroScans]", "(v3) [ZeroScans]")
+
+			if "The Undefeatable Swordsman" in raw_path:
+				raw_path.replace("[ZeroScans]", "(v2) [ZeroScans]")
+
 			shutil.move(chapter_path, raw_path)
+
 		
 		shutil.rmtree(manga_path)
 
