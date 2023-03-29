@@ -3,7 +3,6 @@ numpy
 pillow
 natsort
 pytest-shutil
-opencv-python
 pydirectory
 requests
 packaging
