@@ -74,6 +74,7 @@ for manga in os.listdir(download_path):
 
 			im = Image.open(img_path)
 			width = im.size[0]
+			im.close()
 
 			if max_width < width:
 				max_width = width
@@ -84,6 +85,7 @@ for manga in os.listdir(download_path):
 			
 			im = Image.open(img_path)
 			width = im.size[0]
+			im.close()
 
 			if width < max_width:
 				ratio = max_width / width
@@ -108,7 +110,7 @@ for manga in os.listdir(download_path):
 
 
 no_stitch = ["魔石异世录——艾莎的救赎", "Star Martial God Technique", "The Demon King Who Lost His Job"] ## To modify to match your paged series
-raw_lst = ["来自深渊的我今天也要拯救人类", "我只想安静地打游戏", "我必须成为怪物", "只靠防御称霸诸天", "我真不是邪神走狗"] ## To modify to match your raws (different stitch size than upload)
+raw = ["来自深渊的我今天也要拯救人类", "我只想安静地打游戏", "我必须成为怪物", "只靠防御称霸诸天", "我真不是邪神走狗"] ## To modify to match your raws (different stitch size than upload)
 
 ## Stitching chapters
 for manga in os.listdir(denoise_path):
