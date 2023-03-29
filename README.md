@@ -1,6 +1,6 @@
 run install.bat
 
-It will install multiple programms such as python, git and 7z
+It will install multiple programms such as python, git, 7z and image magick
 
 Verify you really need those before running
 
