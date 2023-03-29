@@ -120,7 +120,7 @@ for manga in os.listdir(denoise_path):
 		print(f"{manga} does not need stitching")
 	
 	elif manga in raw:
-		subprocess.run(['python', path_stitcher, '-i', manga_path, '-sh', '10000', '-t', '.png', '-dt', '90', '-sl', '15'])
+		subprocess.run(['python', path_stitcher, '-i', manga_path, '-sh', '10000', '-t', '.png', '-s', '90', '-sl', '15'])
 		shutil.rmtree(manga_path)
 		os.rename(os.path.join(manga_path, "[stitched]"), manga_path)
 
