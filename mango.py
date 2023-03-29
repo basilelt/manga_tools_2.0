@@ -1,7 +1,7 @@
 import os
 import subprocess
 import shutil
-import cv2
+from PIL import Image
 import math
 
 ## ! Install requirements.txt with pip !
@@ -66,10 +66,14 @@ for manga in os.listdir(download_path):
 		max_width = 0
 		for img in os.listdir(chapter_path):
 			img_path = os.path.join(chapter_path, img)
-			subprocess.run([path_mogrify, img_path])
+			subprocess.run([path_mogrify, '-format', 'png', img_path])
+			if "jpg" in img_path:
+				os.remove(img_path)
+				img_path = img_path.replace("jpg", "png")
 
-			im = cv2.imread(img_path)
-			width = im.shape[1]
+
+			im = Image.open(img_path)
+			width = im.size[0]
 
 			if max_width < width:
 				max_width = width
@@ -78,8 +82,8 @@ for manga in os.listdir(download_path):
 			img_path = os.path.join(chapter_path, img)
 			img_out_path = os.path.join(chapter_out_path, img)
 			
-			im = cv2.imread(img_path)
-			width = im.shape[1]
+			im = Image.open(img_path)
+			width = im.size[0]
 
 			if width < max_width:
 				ratio = max_width / width
@@ -90,12 +94,12 @@ for manga in os.listdir(download_path):
 					ratio = i
 				ratio = str(ratio)
 
-				subprocess.run([waifu_path, '-i', img_path, '-o', img_out_path, '-n', '3', '-s', ratio, '-x'])
+				subprocess.run([waifu_path, '-i', img_path, '-o', img_out_path, '-n', '3', '-s', ratio, '-x', '-f', 'png'])
 				size = str(max_width) + "x"
 				subprocess.run([path_magick, img_out_path, "-resize", size, img_out_path])
 
 			elif manga in to_denoise:
-				subprocess.run([waifu_path, '-i', img_path, '-o', img_out_path, '-n', '3', '-s', '1', '-x'])
+				subprocess.run([waifu_path, '-i', img_path, '-o', img_out_path, '-n', '3', '-s', '1', '-x', '-f', 'png'])
 
 			else:
 				shutil.move(img_path, img_out_path)
@@ -104,7 +108,7 @@ for manga in os.listdir(download_path):
 
 
 no_stitch = ["魔石异世录——艾莎的救赎", "Star Martial God Technique", "The Demon King Who Lost His Job"] ## To modify to match your paged series
-raw = ["来自深渊的我今天也要拯救人类", "我只想安静地打游戏", "我必须成为怪物", "只靠防御称霸诸天", "我真不是邪神走狗"] ## To modify to match your raws (different stitch size than upload)
+raw_lst = ["来自深渊的我今天也要拯救人类", "我只想安静地打游戏", "我必须成为怪物", "只靠防御称霸诸天", "我真不是邪神走狗"] ## To modify to match your raws (different stitch size than upload)
 
 ## Stitching chapters
 for manga in os.listdir(denoise_path):
@@ -125,8 +129,9 @@ for manga in os.listdir(denoise_path):
 
 
 ## Optimizing images
-subprocess.run([oxipng_path, denoise_path, '-o', 'max', '-r', '--strip', 'all', '-a', '-i', '0', '--fix', '-Z', '-t', '512'])
+subprocess.run([oxipng_path, denoise_path, '-o', '3', '-r', '--strip', 'all', '-a', '-i', '0', '-t', '32'])
 ## '-f', '0,9', '-zc', '12'
+## '-o', 'max', '-Z', '--fix'
 
 
 ## Moving Output to Drive directory
@@ -164,10 +169,10 @@ for manga in os.listdir(denoise_path):
 			raw_path = os.path.join(upload_path, chapter.replace("Chapter ", "c"))
 			
 			if "Second Life Ranker" in raw_path:
-				raw_path.replace("[ZeroScans]", "(v3) [ZeroScans]")
+				raw_path = raw_path.replace("[ZeroScans]", "(v3) [ZeroScans]")
 
 			if "The Undefeatable Swordsman" in raw_path:
-				raw_path.replace("[ZeroScans]", "(v2) [ZeroScans]")
+				raw_path = raw_path.replace("[ZeroScans]", "(v2) [ZeroScans]")
 
 			shutil.move(chapter_path, raw_path)
 
@@ -176,7 +181,7 @@ for manga in os.listdir(denoise_path):
 
 
 ## Upload chapter to mangadex
-#subprocess.run(['python', mangadex_path])
-#shutil.rmtree(manga_path)
+subprocess.run(['python', mangadex_path])
+shutil.rmtree(uploaded_path)
 
 print("done")
