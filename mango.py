@@ -122,7 +122,7 @@ for manga in os.listdir(denoise_path):
 	elif manga in raw:
 		subprocess.run(['python', path_stitcher, '-i', manga_path, '-sh', '10000', '-t', '.png', '-s', '90', '-sl', '15'])
 		shutil.rmtree(manga_path)
-		os.rename(os.path.join(manga_path, "[stitched]"), manga_path)
+		os.rename(manga_path, + " [stitched]", manga_path)
 
 	else:
 		subprocess.run(['python', path_stitcher, '-i', manga_path, '-sh', '2000', '-t', '.png', '-dt', 'none', '-sl', '50'])
