@@ -32,8 +32,8 @@ drive_path = r'D:\Gdrive\.shortcut-targets-by-id\1dp1NNqw9AuMIHcOgoY8TJT6c75HwHB
 subprocess.run([path_fmd])
 
 ## To modify to match your raws and drive folders
-raw_lst =["来自深渊的我今天也要拯救人类", "我只想安静地打游戏", "我必须成为怪物", "只靠防御称霸诸天", "魔石异世录——艾莎的救赎"]
-name_lst = ["Abyss", "I Just Want to Play the Game Quietly", "I Must Become A Monster", "Dominate the World Only by Defense", "Aisha's Salvation"]
+raw_lst =["来自深渊的我今天也要拯救人类", "我只想安静地打游戏", "我必须成为怪物", "只靠防御称霸诸天", "魔石异世录——艾莎的救赎", "恶龙转生，复仇从五岁开始！"]
+name_lst = ["Abyss", "I Just Want to Play the Game Quietly", "I Must Become A Monster", "Dominate the World Only by Defense", "Aisha's Salvation", "My Dragon System"]
 to_denoise = raw_lst + ['我真不是邪神走狗']
 
 
@@ -110,7 +110,7 @@ for manga in os.listdir(download_path):
 
 
 no_stitch = ["魔石异世录——艾莎的救赎", "Star Martial God Technique", "The Demon King Who Lost His Job"] ## To modify to match your paged series
-raw = ["来自深渊的我今天也要拯救人类", "我只想安静地打游戏", "我必须成为怪物", "只靠防御称霸诸天", "我真不是邪神走狗"] ## To modify to match your raws (different stitch size than upload)
+raw = ["来自深渊的我今天也要拯救人类", "我只想安静地打游戏", "我必须成为怪物", "只靠防御称霸诸天", "我真不是邪神走狗", "恶龙转生，复仇从五岁开始！"] ## To modify to match your raws (different stitch size than upload)
 
 ## Stitching chapters
 for manga in os.listdir(denoise_path):
@@ -122,7 +122,7 @@ for manga in os.listdir(denoise_path):
 	elif manga in raw:
 		subprocess.run(['python', path_stitcher, '-i', manga_path, '-sh', '10000', '-t', '.png', '-s', '90', '-sl', '15'])
 		shutil.rmtree(manga_path)
-		os.rename(manga_path, + " [stitched]", manga_path)
+		os.rename(manga_path + " [stitched]", manga_path)
 
 	else:
 		subprocess.run(['python', path_stitcher, '-i', manga_path, '-sh', '2000', '-t', '.png', '-dt', 'none', '-sl', '50'])
@@ -136,10 +136,55 @@ subprocess.run([oxipng_path, denoise_path, '-o', '3', '-r', '--strip', 'all', '-
 ## '-o', 'max', '-Z', '--fix'
 
 
+## Moving Output to Drive directory
+for manga in os.listdir(denoise_path):
+	manga_path = os.path.join(denoise_path, manga)
+
+	if manga in raw_lst:
+		for i in range(len(raw_lst)):
+			if manga == raw_lst[i]:
+				title = name_lst[i]
+				folder_raw = r'1. Project RAWs'
+			
+				for chapter in os.listdir(manga_path):
+					chapter_path = os.path.join(manga_path, chapter)
+					raw_path = os.path.join(drive_path, title, folder_raw, chapters)
+					
+					shutil.move(chapter_path, raw_path)
+			
+				shutil.rmtree(manga_path)
+				break
+
+	## Other path
+	elif manga == '我真不是邪神走狗':
+		for chapter in os.listdir(manga_path):
+			chapter_path = os.path.join(manga_path, chapter)
+			raw_path = os.path.join(r'D:\Gdrive\My Drive\RAW', chapter) ## Outside tree folder
+			
+			shutil.move(chapter_path, raw_path)
+		
+		shutil.rmtree(manga_path)
+
+	else:
+		for chapter in os.listdir(manga_path):
+			chapter_path = os.path.join(manga_path, chapter)
+			raw_path = os.path.join(upload_path, chapter.replace("Chapter ", "c"))
+			
+			if "Second Life Ranker" in raw_path:
+				raw_path = raw_path.replace("[ZeroScans]", "(v3) [ZeroScans]")
+
+			if "The Undefeatable Swordsman" in raw_path:
+				raw_path = raw_path.replace("[ZeroScans]", "(v2) [ZeroScans]")
+
+			shutil.move(chapter_path, raw_path)
+
+		
+		shutil.rmtree(manga_path)
+
 
 ## Upload chapter to mangadex
 os.chdir(os.path.join(current_path, "mangadex_bulk_uploader"))
 subprocess.run(['python', mangadex_path])
-shutil.rmtree(uploaded_path)
+#shutil.rmtree(uploaded_path)
 
 print("done")
