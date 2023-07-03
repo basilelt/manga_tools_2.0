@@ -3,6 +3,7 @@ import subprocess
 import shutil
 from PIL import Image
 import math
+import statistics
 
 ## ! Install requirements.txt with pip !
 
@@ -32,8 +33,8 @@ drive_path = r'D:\Gdrive\.shortcut-targets-by-id\1dp1NNqw9AuMIHcOgoY8TJT6c75HwHB
 subprocess.run([path_fmd])
 
 ## To modify to match your raws and drive folders
-raw_lst =["来自深渊的我今天也要拯救人类", "我只想安静地打游戏", "我必须成为怪物", "只靠防御称霸诸天", "魔石异世录——艾莎的救赎", "恶龙转生，复仇从五岁开始！", "失业魔王"]
-name_lst = ["Abyss", "I Just Want to Play the Game Quietly", "I Must Become A Monster", "Dominate the World Only by Defense", "Aisha's Salvation", "My Dragon System", "The Demon King Who Lost His Job"]
+raw_lst =["来自深渊的我今天也要拯救人类", "我只想安静地打游戏", "我必须成为怪物", "只靠防御称霸诸天", "魔石异世录——艾莎的救赎", "恶龙转生，复仇从五岁开始！", "失业魔王", "我困在这一天已三千年", "斩月"]
+name_lst = ["Abyss", "I Just Want to Play the Game Quietly", "I Must Become A Monster", "Dominate the World Only by Defense", "Aisha's Salvation", "My Dragon System", "The Demon King Who Lost His Job", "I’ve Been Trapped on the Same Day for Over 3000 Years", "Moon Slayer"]
 to_denoise = raw_lst + ['我真不是邪神走狗']
 
 
@@ -63,7 +64,7 @@ for manga in os.listdir(download_path):
 		chapter_out_path = os.path.join(denoise_out, chapter)
 		os.makedirs(chapter_out_path)
 
-		max_width = 0
+		width_lst = []
 		for img in os.listdir(chapter_path):
 			img_path = os.path.join(chapter_path, img)
 			subprocess.run([path_mogrify, '-format', 'png', img_path])
@@ -71,13 +72,20 @@ for manga in os.listdir(download_path):
 				os.remove(img_path)
 				img_path = img_path.replace("jpg", "png")
 
+			elif "jpeg" in img_path:
+				os.remove(img_path)
+				img_path = img_path.replace("jpeg", "png")
+
+			elif "webp" in img_path:
+				os.remove(img_path)
+				img_path = img_path.replace("webp", "png")
+
 
 			im = Image.open(img_path)
-			width = im.size[0]
+			width_lst = width + [im.size[0]]
 			im.close()
 
-			if max_width < width:
-				max_width = width
+		median = int(statistics.median(width_lst))
 		
 		for img in os.listdir(chapter_path):
 			img_path = os.path.join(chapter_path, img)
@@ -86,9 +94,10 @@ for manga in os.listdir(download_path):
 			im = Image.open(img_path)
 			width = im.size[0]
 			im.close()
+			no_waifu = True
 
-			if width < max_width:
-				ratio = max_width / width
+			if width < median:
+				ratio = median / width
 				if int(ratio) not in [1, 2, 4, 8, 16, 32, 64, 128]:
 					i = 2
 					while i < ratio:
@@ -97,10 +106,16 @@ for manga in os.listdir(download_path):
 				ratio = str(ratio)
 
 				subprocess.run([waifu_path, '-i', img_path, '-o', img_out_path, '-n', '3', '-s', ratio, '-x', '-f', 'png'])
-				size = str(max_width) + "x"
+				size = str(median) + "x"
 				subprocess.run([path_magick, img_out_path, "-resize", size, img_out_path])
+				no_waifu = False
 
-			elif manga in to_denoise:
+			elif width > median:
+				size = str(median) + "x"
+				subprocess.run([path_magick, img_path, "-resize", size, img_out_path])
+				os.remove(img_path)
+
+			if manga in to_denoise and no_waifu:
 				subprocess.run([waifu_path, '-i', img_path, '-o', img_out_path, '-n', '3', '-s', '1', '-x', '-f', 'png'])
 
 			else:
@@ -110,7 +125,7 @@ for manga in os.listdir(download_path):
 
 
 no_stitch = ["魔石异世录——艾莎的救赎", "Star Martial God Technique", "The Demon King Who Lost His Job"] ## To modify to match your paged series
-raw = ["来自深渊的我今天也要拯救人类", "我只想安静地打游戏", "我必须成为怪物", "只靠防御称霸诸天", "我真不是邪神走狗", "恶龙转生，复仇从五岁开始！", "失业魔王"] ## To modify to match your raws (different stitch size than upload)
+raw = ["来自深渊的我今天也要拯救人类", "我只想安静地打游戏", "我必须成为怪物", "只靠防御称霸诸天", "我真不是邪神走狗", "恶龙转生，复仇从五岁开始！", "失业魔王", "我老婆是魔王大人", "我困在这一天已三千年", "斩月"] ## To modify to match your raws (different stitch size than upload)
 
 ## Stitching chapters
 for manga in os.listdir(denoise_path):
@@ -131,7 +146,7 @@ for manga in os.listdir(denoise_path):
 
 
 ## Optimizing images
-subprocess.run([oxipng_path, denoise_path, '-o', '3', '-r', '--strip', 'all', '-a', '-i', '0', '-t', '32'])
+subprocess.run([oxipng_path, denoise_path, '-o', '4', '-r', '--strip', 'all', '-a', '-i', '0', '-t', '32'])
 ## '-f', '0,9', '-zc', '12'
 ## '-o', 'max', '-Z', '--fix'
 
@@ -159,7 +174,16 @@ for manga in os.listdir(denoise_path):
 	elif manga == '我真不是邪神走狗':
 		for chapter in os.listdir(manga_path):
 			chapter_path = os.path.join(manga_path, chapter)
-			raw_path = os.path.join(r'D:\Gdrive\My Drive\RAW', chapter) ## Outside tree folder
+			raw_path = os.path.join(r'D:\Gdrive\My Drive\ZeroScans\RAW_demon_lackey', chapter) ## Outside tree folder
+			
+			shutil.move(chapter_path, raw_path)
+		
+		shutil.rmtree(manga_path)
+		
+	elif manga == '我老婆是魔王大人':
+		for chapter in os.listdir(manga_path):
+			chapter_path = os.path.join(manga_path, chapter)
+			raw_path = os.path.join(r'D:\Gdrive\My Drive\ZeroScans\RAW_wife', chapter) ## Outside tree folder
 			
 			shutil.move(chapter_path, raw_path)
 		
@@ -191,6 +215,7 @@ for manga in os.listdir(denoise_path):
 ## Upload chapter to mangadex
 os.chdir(os.path.join(current_path, "mangadex_bulk_uploader"))
 subprocess.run(['python', mangadex_path])
-#shutil.rmtree(uploaded_path)
+shutil.rmtree(uploaded_path)
+os.mkdir(uploaded_path)
 
 print("done")
