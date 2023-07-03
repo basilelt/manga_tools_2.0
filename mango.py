@@ -65,6 +65,7 @@ for manga in os.listdir(download_path):
 		os.makedirs(chapter_out_path)
 
 		width_lst = []
+
 		for img in os.listdir(chapter_path):
 			img_path = os.path.join(chapter_path, img)
 			subprocess.run([path_mogrify, '-format', 'png', img_path])
@@ -82,7 +83,7 @@ for manga in os.listdir(download_path):
 
 
 			im = Image.open(img_path)
-			width_lst = width + [im.size[0]]
+			width_lst.append(im.size[0])
 			im.close()
 
 		median = int(statistics.median(width_lst))
@@ -120,6 +121,8 @@ for manga in os.listdir(download_path):
 
 			else:
 				shutil.move(img_path, img_out_path)
+
+		width_lst.clear()
 
 	shutil.rmtree(manga_path)
 
